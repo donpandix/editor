@@ -1,17 +1,19 @@
 <?php
 /**
- *  Editor de código fuente de archivos existentes en el servidor
+ *	Editor de código fuente de archivos existentes en el servidor
  *  @autor Cesar Gonzalez Molina, twitter: @donpandix, email: hello@cesarg.cl
- *  @version: 1.1
+ *	@version: 1.2
  *
- *  Novedad version 1.1 : panel izquierdo de navegación y edición de archivos
+ *	Novedad version 1.1 : panel izquierdo de navegación y edición de archivos
+ * *	Novedad version 1.2 : qyuita el link para modificar este archivo.
  */
 
+ 
 $archivoEditable 	= false;
 $contentFile		= '';
 $fileUrl			= '';
 $pathBase			= implode('/', explode('\\', dirname(__FILE__)));
-
+ 
 if (isset($_POST['path_url'])) {
 
 	$_POST['path_url'] = implode('/', explode('\\', $_POST['path_url']));
@@ -24,7 +26,6 @@ if (isset($_POST['path_url'])) {
 		array_pop($temp);array_pop($temp);
 		$_POST['path_url'] = implode('/', $temp);
 	}
-
 
 	$pathBase = $_POST['path_url'];	
 }
@@ -64,19 +65,23 @@ class fileEditor {
 
 		global $pathBase;
 
-		$directorio = opendir($this->rootPath ); 
-		while ($archivo = readdir($directorio))
-
+		$directorio 	= opendir($this->rootPath ); 
+		
+		while ($archivo = readdir($directorio)) {
 			if ( ! is_dir( $pathBase .'\\' . $archivo ) && ( __FILE__ != ($pathBase .'\\'. $archivo) ) ) {
-				echo '<a href="javascript:triggerAction(\'' . $archivo . '\')"><span class="glyphicon glyphicon-file" aria-hidden="true"></span> &nbsp;'.$archivo.'</a><br>'; 
+				if (implode('/', explode('\\',dirname(__FILE__))) . '\\' . basename(__FILE__) != $pathBase .'\\'. $archivo) {
+					echo '<a href="javascript:triggerAction(\'' . $archivo . '\')"><span class="glyphicon glyphicon-file" aria-hidden="true"></span> &nbsp;'.$archivo.'</a><br>'; 
+				} else {
+					echo '<span class="glyphicon glyphicon-file" aria-hidden="true"></span> &nbsp;'.$archivo.'<br>'; 
+				}
 			} else {
 				if (is_dir( $pathBase .'\\' . $archivo )) {
 					echo '<a href="javascript:triggerNav(\'' . $archivo . '\')"><span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span> &nbsp;'.$archivo.'</a><br>'; 
 				} else {
 					echo $archivo . '<br>';	
 				}
-				
 			}
+		}
 		  
 		closedir($directorio); 
 	}
@@ -84,7 +89,6 @@ class fileEditor {
 }
 
 $myEditor = new fileEditor( $pathBase );
- 
 ?>
 <!DOCTYPE html>
 <html>
@@ -103,7 +107,7 @@ $myEditor = new fileEditor( $pathBase );
 			}
 
 			#coding {
-			font-family: 'Droid Sans Mono' ;
+				font-family: 'Droid Sans Mono' ;
 				font-weight: 400; 
 				width:100%;
 				height:400px;
@@ -119,15 +123,13 @@ $myEditor = new fileEditor( $pathBase );
 			}
 
 			function triggerNav ( pathFolder ) {
-				$("#pathurl").val( "<?php echo $pathBase ?>/" + pathFolder);
+				$("#pathurl").val( '<?php echo $pathBase . '/' ?>' + pathFolder);
 				$("#frm_path").submit();
 			}	
-
 
 		</script>
 	</head>
 	<body>
-
 
 		<div class="well">
 			<form method="POST" id="frm_path" action="" style="display:block;margin:0px;" >
@@ -177,7 +179,8 @@ $myEditor = new fileEditor( $pathBase );
 				<input name="file_url" value="" id="txt_file" >
 				<input name="path_url" value="<?php echo $pathBase ?>" >
 			</form>
-			
+
+
 		<hr>
 		<footer>
         <p style="text-align:right;margin-right:20px;font-size:0.8em;">Cesar Gonzalez <?php echo date('Y') ?>, <a href="http://twitter.com/donpandix" target="_blank">@donpandix</a></p>
